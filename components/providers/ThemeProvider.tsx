@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 type Theme = "light" | "dark";
 
@@ -9,33 +9,30 @@ const ThemeContext = createContext<{ theme: Theme; toggleTheme: () => void }>({
   toggleTheme: () => {},
 });
 
+function getInitialTheme(): Theme {
+  if (typeof window === "undefined") return "light";
+  const stored = localStorage.getItem("theme") as Theme | null;
+  if (stored) return stored;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") return "light";
-    const stored = localStorage.getItem("theme") as Theme | null;
-    const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    return stored ?? preferred;
-  });
-  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const mounted = useRef(false);
 
   useEffect(() => {
+    mounted.current = true;
     document.documentElement.classList.toggle("dark", theme === "dark");
-    setMounted(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
-  }, [theme, mounted]);
+  }, [theme]);
 
   function toggleTheme() {
-    setTheme((t) => (t === "dark" ? "light" : "dark"));
+    setTheme((t) => {
+      const next = t === "dark" ? "light" : "dark";
+      localStorage.setItem("theme", next);
+      document.documentElement.classList.toggle("dark", next === "dark");
+      return next;
+    });
   }
-
-  // Prevent flash of wrong theme
-  if (!mounted) return <>{children}</>;
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
