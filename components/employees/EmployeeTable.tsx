@@ -111,6 +111,7 @@ export function EmployeeTable({ data, onEdit, onDelete }: Props) {
     },
   ];
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data, columns,
     getCoreRowModel: getCoreRowModel(),
