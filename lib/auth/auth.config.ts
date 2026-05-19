@@ -18,8 +18,13 @@ export const authConfig: NextAuthConfig = {
       }
       return session;
     },
-    authorized({ auth }) {
-      return !!auth?.user;
+    authorized({ auth, request }) {
+      if (!auth?.user) return false;
+      const pathname = request.nextUrl.pathname;
+      if (pathname.startsWith("/salary") && (auth.user as { role?: string }).role === "employee_viewer") {
+        return Response.redirect(new URL("/dashboard", request.nextUrl));
+      }
+      return true;
     },
   },
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
