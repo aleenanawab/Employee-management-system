@@ -31,11 +31,11 @@ export function DropdownMenuTrigger({ children, asChild }: { children: React.Rea
   return <button onClick={() => setOpen(!open)}>{children}</button>;
 }
 
-export function DropdownMenuContent({ children, align = "start", className }: { children: React.ReactNode; align?: "start" | "end"; className?: string }) {
+export function DropdownMenuContent({ children, align = "start", className, style }: { children: React.ReactNode; align?: "start" | "end"; className?: string; style?: React.CSSProperties }) {
   const { open } = useContext(DropdownContext);
   if (!open) return null;
   return (
-    <div className={cn(
+    <div style={style} className={cn(
       "absolute z-50 mt-2 min-w-[160px] rounded-2xl border shadow-xl",
       "bg-white dark:bg-gray-900 dark:border-gray-700/60",
       "ring-1 ring-black/5 dark:ring-white/5",
@@ -47,15 +47,15 @@ export function DropdownMenuContent({ children, align = "start", className }: { 
   );
 }
 
-export function DropdownMenuLabel({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn("px-2 py-1.5 text-sm text-gray-900 dark:text-white", className)}>{children}</div>;
+export function DropdownMenuLabel({ children, className, style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
+  return <div style={style} className={cn("px-2 py-1.5 text-sm text-gray-900 dark:text-white", className)}>{children}</div>;
 }
 
-export function DropdownMenuSeparator() {
-  return <div className="my-1 h-px bg-gray-100 dark:bg-gray-700/60" />;
+export function DropdownMenuSeparator({ style }: { style?: React.CSSProperties }) {
+  return <div style={style} className="my-1 h-px bg-gray-100 dark:bg-gray-700/60" />;
 }
 
-export function DropdownMenuItem({ children, className, onClick, asChild }: { children: React.ReactNode; className?: string; onClick?: () => void; asChild?: boolean }) {
+export function DropdownMenuItem({ children, className, onClick, asChild, style }: { children: React.ReactNode; className?: string; onClick?: () => void; asChild?: boolean; style?: React.CSSProperties }) {
   const { setOpen } = useContext(DropdownContext);
   const base = cn(
     "flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-sm text-gray-700 dark:text-gray-300",
@@ -67,7 +67,7 @@ export function DropdownMenuItem({ children, className, onClick, asChild }: { ch
     return <child.type {...child.props} className={cn(base, child.props.className)} onClick={() => { child.props.onClick?.(); setOpen(false); }} />;
   }
   return (
-    <button onClick={() => { onClick?.(); setOpen(false); }} className={base}>
+    <button style={style} onClick={() => { onClick?.(); setOpen(false); }} className={base}>
       {children}
     </button>
   );
